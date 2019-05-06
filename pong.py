@@ -13,7 +13,6 @@ class Paddle:
 
     def draw(self):
         pygame.draw.rect(self.screen, self.color, self.rect_data)
-        
     def move(self, x, y):
         self.rect_data.x = x
         self.rect_data.y  = y

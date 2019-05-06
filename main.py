@@ -13,20 +13,31 @@ game_display = pygame.display.set_mode(screen_size)
 pygame.display.set_caption('Pong Clone')
 clock = pygame.time.Clock()
 
+paddle_speed = 10
+
 #====== Game Loop ==
 
-paddle1 = Paddle(game_display, 100, 100, 100, 100)
+player = Paddle(game_display, 100, 100, 100, 100)
+x, y
 
 while game_run:
     # Event Loop
+    # Quit Event X
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             game_run = False
+        # KeyDown Events
+        if event.type == pygame.KEYDOWN:
+            if event.type == pygame.K_LEFT:
+                x = player.x - player_speed
+                player.move(x, player.y)
+            if event.type == pygame.K_RIGHT:
+                x = player.x + player_speed
+                player.move(x , player.y)
         
     game_display.fill( (0,0,0) )
 
-    paddle1.draw()
-    paddle1.move(500,500)
+    player.draw()
     
     # Updates frame
     pygame.display.update()
