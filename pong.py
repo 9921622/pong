@@ -10,10 +10,15 @@ class Paddle:
         self.color = color
         
         self.rect_data = pygame.Rect(self.x,self.y,self.width,self.height)
-
     def draw(self):
         pygame.draw.rect(self.screen, self.color, self.rect_data)
     def move(self, x, y):
         self.rect_data.x = x
         self.rect_data.y  = y
         
+class Ball(Paddle):
+    def __init__(self, screen, x, y, w, h, color = (255,255,255) ):
+        Paddle.__init__(self, screen, x, y, w, h, color)
+        
+    def ball_move(self):
+        pass
