@@ -1,6 +1,7 @@
 import pygame
 from pong import *
 from enum import Enum
+import random
 
 # Window Settings
 FPS = 120
@@ -19,8 +20,9 @@ clock = pygame.time.Clock()
 # Game Settings
 paddle_speed = 5
 paddle_size = (200, 25)
-left, right, up, down = False, False, False, False
 
+ball_speed = 3
+ball_rotation = 0
 ball_size = (25,25)
 
 #====== Game Loop ==
@@ -28,8 +30,8 @@ ball_size = (25,25)
 player = Paddle(game_display, 100, 700, paddle_size[0], paddle_size[1])
 x, y = player.x, player.y
 
-ball = Ball(game_display, WIDTH/2, HEIGHT/2, ball_size[0], ball_size[1])
-ball_dir = 0
+ball = Ball(game_display, WIDTH/2, HEIGHT/2, ball_size[0], ball_size[1], down = True)
+ball_x, ball_y = ball.x, ball.y
 
 while game_run:
     # Event Loop
@@ -41,21 +43,31 @@ while game_run:
         if event.type == pygame.KEYDOWN:
             # a or left arrow
             if event.key == pygame.K_a or event.key == pygame.K_LEFT:
-                left = True
+                player.left = True
             # d or right arrow
             if event.key == pygame.K_d or event.key == pygame.K_RIGHT:
-                right = True
+                player.right = True
         # KeyUp Events
         if event.type == pygame.KEYUP:
             # a or left arrow
             if event.key == pygame.K_a or event.key == pygame.K_LEFT:
-                left = False
+                player.left = False
             # d or right arrow
             if event.key == pygame.K_d or event.key == pygame.K_RIGHT:
-                right = False
+                player.right = False
+                
     # get key state from Events Loop and move paddle accordlingly
-    if left: x -= paddle_speed
-    if right: x += paddle_speed
+    if player.left: x -= paddle_speed
+    if player.right: x += paddle_speed
+    # ball movement
+    if not ball.right:
+        ball_x -= ball_speed # replace with rand rotation that clamped
+    if ball.right:
+        ball_x += ball_speed
+    if not ball.down:
+        ball_y -= ball_speed
+    if ball.down:
+        ball_y += ball_speed
     
     # collision
     # player paddle with screen
@@ -63,17 +75,33 @@ while game_run:
         x = WIDTH - player.width
     if x < 0:
         x = 0
+        
     # ball with screen
-
+    if ball_x > WIDTH - ball.width:
+        ball_x = WIDTH - ball.width
+        ball.right = False
+    if ball_x < 0:
+        ball_x = 0
+        ball.right = True
+    if ball_y > HEIGHT - ball.height:
+        ball_y = HEIGHT - ball.height
+        ball.down = False
+    if ball_y < 0:
+        ball_y = 0
+        ball.down = True
+        
     # ball with paddle
-     
-    
+    if player.rect_data.colliderect(ball.rect_data):
+        ball.down = False
     
     game_display.fill( (0,0,0) )
+    
     player.move(x, y)
     player.draw()
 
+    ball.move(ball_x, ball_y)
     ball.draw()
+    
     
     # Updates frame
     pygame.display.update()

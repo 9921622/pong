@@ -1,13 +1,15 @@
 import pygame
 
 class Paddle:
-    def __init__(self, screen, x, y, w, h, color = (255,255,255) ):
+    def __init__(self, screen, x, y, w, h, color = (255,255,255),left=False,right=False ):
         self.screen = screen
         self.x = x
         self.y = y
         self.width = w
         self.height = h
         self.color = color
+        self.left = left
+        self.right = right
         
         self.rect_data = pygame.Rect(self.x,self.y,self.width,self.height)
     def draw(self):
@@ -17,8 +19,11 @@ class Paddle:
         self.rect_data.y  = y
         
 class Ball(Paddle):
-    def __init__(self, screen, x, y, w, h, color = (255,255,255) ):
-        Paddle.__init__(self, screen, x, y, w, h, color)
+    def __init__(self, screen, x, y, w, h, color = (255,255,255),left=False,right=False,up=False,down=False):
+        Paddle.__init__(self, screen, x, y, w, h, color, left, right)
+
+        self.up = up
+        self.down = down
         
     def ball_move(self):
         pass
