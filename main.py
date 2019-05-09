@@ -27,10 +27,10 @@ ball_size = (25,25)
 
 #====== Game Loop ==
 
-player = Paddle(game_display, 100, 700, paddle_size[0], paddle_size[1])
+player = Paddle(game_display, 100, 700, paddle_size[0], paddle_size[1], paddle_speed)
 x, y = player.x, player.y
 
-ball = Ball(game_display, WIDTH/2, HEIGHT/2, ball_size[0], ball_size[1], down = True)
+ball = Ball(game_display, WIDTH/2, HEIGHT/2, ball_size[0], ball_size[1], down = True, speed=ball_speed)
 ball_x, ball_y = ball.x, ball.y
 
 while game_run:
@@ -57,51 +57,23 @@ while game_run:
                 player.right = False
                 
     # get key state from Events Loop and move paddle accordlingly
-    if player.left: x -= paddle_speed
-    if player.right: x += paddle_speed
-    # ball movement
-    if not ball.right:
-        ball_x -= ball_speed # replace with rand rotation that clamped
-    if ball.right:
-        ball_x += ball_speed
-    if not ball.down:
-        ball_y -= ball_speed
-    if ball.down:
-        ball_y += ball_speed
-    
-    # collision
-    # player paddle with screen
-    if x > WIDTH - player.width:
-        x = WIDTH - player.width
-    if x < 0:
-        x = 0
+    if player.left and x > 0: x -= player.speed
+    if player.right and x + player.width < WIDTH : x += player.speed
+    # ball movement # replace with rand rotation that clamped
+    if not ball.right: ball_x -= ball.speed
+    if ball.right: ball_x += ball.speed
+    if not ball.down: ball_y -= ball.speed
+    if ball.down: ball_y += ball.speed
         
-    # ball with screen
-    if ball_x > WIDTH - ball.width:
-        ball_x = WIDTH - ball.width
-        ball.right = False
-    if ball_x < 0:
-        ball_x = 0
-        ball.right = True
-    if ball_y > HEIGHT - ball.height:
-        ball_y = HEIGHT - ball.height
-        ball.down = False
-    if ball_y < 0:
-        ball_y = 0
-        ball.down = True
-        
-    # ball with paddle
-    if player.rect_data.colliderect(ball.rect_data):
-        ball.down = False
-    
     game_display.fill( (0,0,0) )
-    
+
     player.move(x, y)
+    player.is_collide()
     player.draw()
 
     ball.move(ball_x, ball_y)
+    ball.is_collide(player.rect_data, 0)
     ball.draw()
-    
     
     # Updates frame
     pygame.display.update()
