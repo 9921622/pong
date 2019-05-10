@@ -1,7 +1,6 @@
 import pygame
 from pong import *
 from enum import Enum
-import random
 
 # Window Settings
 FPS = 120
@@ -21,17 +20,20 @@ clock = pygame.time.Clock()
 paddle_speed = 5
 paddle_size = (200, 25)
 
-ball_speed = 3
+ball_speed = 10
 ball_rotation = 0
 ball_size = (25,25)
 
 #====== Game Loop ==
 
-player = Paddle(game_display, 100, 700, paddle_size[0], paddle_size[1], paddle_speed)
+player = Paddle(game_display, 100, 700, paddle_size[0], paddle_size[1], speed=paddle_speed)
 x, y = player.x, player.y
 
 ball = Ball(game_display, WIDTH/2, HEIGHT/2, ball_size[0], ball_size[1], down = True, speed=ball_speed)
 ball_x, ball_y = ball.x, ball.y
+
+ai = AI_Paddle(game_display, 100, 75, paddle_size[0], paddle_size[1], speed=paddle_speed)
+ai_x, ai_y = ai.x, ai.y
 
 while game_run:
     # Event Loop
@@ -60,10 +62,15 @@ while game_run:
     if player.left and x > 0: x -= player.speed
     if player.right and x + player.width < WIDTH : x += player.speed
     # ball movement # replace with rand rotation that clamped
-    if not ball.right: ball_x -= ball.speed
-    if ball.right: ball_x += ball.speed
-    if not ball.down: ball_y -= ball.speed
-    if ball.down: ball_y += ball.speed
+    if not ball.right: ball_x -= ball.dir_x
+    if ball.right: ball_x += ball.dir_x
+    if not ball.down: ball_y -= ball.dir_y
+    if ball.down: ball_y += ball.dir_y
+    # AI movement
+    ai.track_ball(ball_x)
+    if ai.left and ai_x > 0: ai_x -= ai.speed
+    if ai.right and ai_x + ai.width < WIDTH : ai_x += player.speed
+
         
     game_display.fill( (0,0,0) )
 
@@ -72,8 +79,22 @@ while game_run:
     player.draw()
 
     ball.move(ball_x, ball_y)
-    ball.is_collide(player.rect_data, 0)
+    win = ball.is_collide(player.rect_data, ai.rect_data)
     ball.draw()
+
+    ai.move(ai_x, ai_y)
+    ai.is_collide()
+    ai.draw()
+
+    if win != None:
+        if win:
+            text(game_display, "You Win!")
+            pygame.time.wait(3000)
+            game_run = False
+        if not win:
+            text(game_display, "You Lose")
+            pygame.time.wait(3000)
+            game_run = False
     
     # Updates frame
     pygame.display.update()

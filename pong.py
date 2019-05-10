@@ -1,4 +1,5 @@
 import pygame
+import random
 
 class Paddle:
     def __init__(self, screen, x, y, w, h, color = (255,255,255),left=False,right=False, speed=5 ):
@@ -25,17 +26,20 @@ class Paddle:
         # paddle with screen
         if self.x > self.scr_WIDTH - self.width:
             self.x = self.scr_WIDTH - self.width
-            return True
         if self.x < 0:
             self.x = 0
-            return True
-        return False
+            
     
 class Ball(Paddle):
     def __init__(self, screen, x, y, w, h, color = (255,255,255),left=False,right=False,up=False,down=False, speed=3):
         Paddle.__init__(self, screen, x, y, w, h, color, left, right, speed)
         self.up = up
         self.down = down
+        
+        self.dir_x = random.randrange(1, self.speed)
+        self.dir_y = self.speed - self.dir_x
+        
+        
         
     def move(self, x, y):
         self.rect_data.x = x
@@ -52,15 +56,44 @@ class Ball(Paddle):
         if self.rect_data.y > self.scr_HEIGHT - self.height:
             self.rect_data.y = self.scr_HEIGHT - self.height
             self.down = False
+            return False
         if self.rect_data.y < 0:
             self.rect_data.y = 0
             self.down = True
-
+            return True
+            
         # ball with paddle
         if player_rect_data.colliderect(self.rect_data):
             self.down = False
+            self.dir_x = random.randrange(1, self.speed)
+            self.dir_y = self.speed - self.dir_x
+        # ball with paddle
+        if AI_rect_data.colliderect(self.rect_data):
+            self.down = True
+            self.dir_x = random.randrange(1, self.speed)
+            self.dir_y = self.speed - self.dir_x
     
 class AI_Paddle(Paddle):
-    def __init__(self, screen, x, y, w, h, color = (255,255,255),left=False,right=False):
-        Paddle.__init__(self, screen, x, y, w, h, color,left,right)
-        
+    def __init__(self, screen, x, y, w, h, color = (255,255,255),left=False,right=False, speed=3):
+        Paddle.__init__(self, screen, x, y, w, h, color,left,right,speed)
+
+    def track_ball(self, ballx):
+        if ballx > self.rect_data.x + self.width/2:
+            self.left = False
+            self.right = True
+        if ballx < self.rect_data.x + self.width/2:
+            self.right = False
+            self.left = True
+    
+
+def text(screen, text):
+    width, height = pygame.display.get_surface().get_size()
+    
+    large_text = pygame.font.SysFont('Arial', 155)
+    text_surf = large_text.render(text, True, (255,255,255) )
+    text_rect = text_surf.get_rect(center=(width/2, height/2))
+    
+    screen.blit(text_surf, text_rect)
+    pygame.display.update()
+
+if __name__ == "__main__": quit()
